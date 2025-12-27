@@ -3,8 +3,6 @@
 A Chrome extension that calculates and displays your **current course grade** on Canvas,
 even when final grades are hidden by the instructor.
 
----
-
 ## Installation
 1. Open **Chrome → Extensions**
 2. Enable **Developer mode** (top right)
