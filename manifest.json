@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+
+  "name": "Canvas Grade Unblocked",
+  "description": "This extension lets you view your grade average for you canvas class, even when viewing grades are disabled.",
+  "version": "1.0",
+  "author": "Jasmine Liu",
+  
+  "content_scripts": [{
+        "run_at": "document_start",
+        "matches": ["*://*.instructure.com/courses/*/grades*"],
+        "js": [
+            "grade_unblocked_script.js"
+        ]
+  }],
+  "permissions": [
+    "storage"
+  ]
+}
