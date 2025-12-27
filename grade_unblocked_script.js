@@ -53,7 +53,6 @@ function gradeCheck(env_script, grade_html_element) {
 
     let { hide_final_grade, submission_info, assignment_info, weighting_scheme } = clean_env(env_script);
 
-    console.log(hide_final_grade, !hide_final_grade);
     if (!hide_final_grade) {
         console.log("No need for grade unblocking");
         return;
@@ -140,12 +139,8 @@ function gradeCheck(env_script, grade_html_element) {
         
         if (total_points > 0 || points_earned > 0) {
             // Only a valid category if there has been some opportunity to earn points
-
-            // Add total weight
-
             total_weight += group["group_weight"];
-            console.log(group, points_earned, total_points);
-
+            
             assignment_group_scores.push({
                 "group_weight": group["group_weight"],
                 "points_earned": points_earned,
@@ -159,8 +154,8 @@ function gradeCheck(env_script, grade_html_element) {
     // Calculating score for different types of weighting
 
     let calculated_grade = -1;
-
-    if (!weighting_scheme || weighting_scheme === "points") {
+    
+    if (weighting_scheme === null || weighting_scheme === "points") {
         // CASE 1: No weighted grading at all
 
         let total_points = 0;
@@ -171,7 +166,7 @@ function gradeCheck(env_script, grade_html_element) {
             points_earned += group["points_earned"];
         }
 
-        calculated_grade = points_earned / total_points;
+        calculated_grade = points_earned / total_points * 100;
     } else if (weighting_scheme === "equal") {
         // CASE 2: Weighting in all assignment categories is equal
 
@@ -181,7 +176,7 @@ function gradeCheck(env_script, grade_html_element) {
             total_average += group["points_earned"] / group["total_points"];
         }
 
-        calculated_grade = total_average / assignment_group_scores.length;
+        calculated_grade = total_average / assignment_group_scores.length * 100;
         
     } else if (weighting_scheme === "percent") {
         // CASE 3: Weighted average
@@ -214,7 +209,13 @@ const observer = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
         if (mutation.addedNodes.length) {
             const found = findENVScript();
-            const grade_html_element = document.getElementById("student-grades-final");
+            let grade_html_element = document.getElementById("student-grades-final");
+
+            let rightSidebar = document.getElementById("student-grades-right-content");
+
+            if (grade_html_element == null) {
+                grade_html_element = rightSidebar.getElementsByClassName("student_assignment final_grade")[0];
+            }
 
             const env_info = found.textContent.match(
                 /ENV\s*=\s*(\{[\s\S]*?\})\s*;\s*BRANDABLE_CSS_HANDLEBARS_INDEX\s*=/
