@@ -1,4 +1,4 @@
-### Canvas Grade Unblocker
+# Canvas Grade Unblocker
 
 A Chrome extension that calculates and displays your **current course grade** on Canvas,
 even when final grades are hidden by the instructor.
