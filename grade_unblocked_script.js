@@ -34,11 +34,32 @@ function get_assignment_points(submission_map, assignment_id) {
     if (!assignment) {
         console.log("COULDN'T FIND ", assignment_id);
         return null;
-    }; 
+    };
 
     if (assignment["excused"] || assignment["workflow_state"] !== "graded") return null;
-    
+
     return assignment["score"]
+}
+
+function showGroupPoints(group_id, points_earned, total_points) {
+    const group_html_element = document.getElementById("submission_group-" + group_id);
+    const assignment_score_html = group_html_element.querySelector(".assignment_score");
+    const details_html = group_html_element.querySelector(".details");
+    const calculated_grade = points_earned / total_points * 100;
+
+    // replace inner html with actual scores & visual format
+
+    assignment_score_html.innerHTML = `
+        <div style="position: relative; height: 100%;" class="score_holder">
+            <span class="assignment_presenter_for_submission" style="display: none;"></span>
+            <span class="react_pill_container"></span>
+            <span class="tooltip">
+                <span class="grade">` + calculated_grade.toFixed(2) + `</span>
+            </span>
+        </div>`
+
+    details_html.innerHTML = `<span class="possible points_possible" aria-label="">` + points_earned.toFixed(2) + `/` + total_points.toFixed(2) + `</span>`;
+
 }
 
 
@@ -55,8 +76,8 @@ function gradeCheck(env_script, grade_html_element) {
 
     if (!hide_final_grade) {
         console.log("No need for grade unblocking");
-        return;
-    }; 
+        // return;
+    };
 
     // Creating a map for submissions by id
     const submission_map = new Map();
@@ -90,13 +111,13 @@ function gradeCheck(env_script, grade_html_element) {
             if (assignment["omit_from_final_grade"]) continue;
 
             const points = get_assignment_points(submission_map, assignment["id"]);
-            
+
             if (points === null) continue;
 
             if (!included_ids.has(assignment["id"])) {
                 assignments.push({
                     "id": assignment["id"],
-                    "score": points/assignment["points_possible"],
+                    "score": points / assignment["points_possible"],
                     "points_earned": points,
                     "total_points": assignment["points_possible"]
                 });
@@ -105,7 +126,7 @@ function gradeCheck(env_script, grade_html_element) {
         }
 
         // Extra rules (for dropping things in the category)
- 
+
         assignments.sort((a, b) => a["score"] - b["score"]);
 
         if ("drop_all_but" in group["rules"]) {
@@ -136,11 +157,11 @@ function gradeCheck(env_script, grade_html_element) {
                 }
             }
         }
-        
+
         if (total_points > 0 || points_earned > 0) {
             // Only a valid category if there has been some opportunity to earn points
             total_weight += group["group_weight"];
-            
+
             assignment_group_scores.push({
                 "group_weight": group["group_weight"],
                 "points_earned": points_earned,
@@ -148,13 +169,16 @@ function gradeCheck(env_script, grade_html_element) {
             });
 
         }
-        
+
+        showGroupPoints(group["id"], points_earned, total_points);
+
+
     }
 
     // Calculating score for different types of weighting
 
     let calculated_grade = -1;
-    
+
     if (weighting_scheme === null || weighting_scheme === "points") {
         // CASE 1: No weighted grading at all
 
@@ -177,7 +201,7 @@ function gradeCheck(env_script, grade_html_element) {
         }
 
         calculated_grade = total_average / assignment_group_scores.length * 100;
-        
+
     } else if (weighting_scheme === "percent") {
         // CASE 3: Weighted average
 
@@ -197,7 +221,7 @@ function gradeCheck(env_script, grade_html_element) {
     }
 
     console.log("CALCULATED GRADE", calculated_grade)
-    
+
     grade_html_element.textContent = "Total: " + calculated_grade.toFixed(2) + "%";
 
 }
@@ -220,7 +244,7 @@ const observer = new MutationObserver((mutations) => {
             const env_info = found?.textContent.match(
                 /ENV\s*=\s*(\{[\s\S]*?\})\s*;\s*BRANDABLE_CSS_HANDLEBARS_INDEX\s*=/
             );
-            
+
             if (found && env_info && grade_html_element) {
                 observer.disconnect();
                 console.log("Found ENV.. Calculating grade");
