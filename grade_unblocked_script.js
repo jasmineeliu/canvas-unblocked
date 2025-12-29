@@ -214,10 +214,10 @@ const observer = new MutationObserver((mutations) => {
             let rightSidebar = document.getElementById("student-grades-right-content");
 
             if (grade_html_element == null) {
-                grade_html_element = rightSidebar.getElementsByClassName("student_assignment final_grade")[0];
+                grade_html_element = rightSidebar?.getElementsByClassName("student_assignment final_grade")[0];
             }
 
-            const env_info = found.textContent.match(
+            const env_info = found?.textContent.match(
                 /ENV\s*=\s*(\{[\s\S]*?\})\s*;\s*BRANDABLE_CSS_HANDLEBARS_INDEX\s*=/
             );
             
