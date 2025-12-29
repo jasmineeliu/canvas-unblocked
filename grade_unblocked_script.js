@@ -76,7 +76,7 @@ function gradeCheck(env_script, grade_html_element) {
 
     if (!hide_final_grade) {
         console.log("No need for grade unblocking");
-        // return;
+        return;
     };
 
     // Creating a map for submissions by id
