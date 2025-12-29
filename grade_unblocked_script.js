@@ -54,7 +54,7 @@ function showGroupPoints(group_id, points_earned, total_points) {
             <span class="assignment_presenter_for_submission" style="display: none;"></span>
             <span class="react_pill_container"></span>
             <span class="tooltip">
-                <span class="grade">` + calculated_grade.toFixed(2) + `</span>
+                <span class="grade">` + calculated_grade.toFixed(2) + `%</span>
             </span>
         </div>`
 
